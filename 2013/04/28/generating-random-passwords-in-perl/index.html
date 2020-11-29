@@ -2,99 +2,99 @@
 <a href=/><div class=name>SALVATORE LAMENDOLA (vt0r)</div></a><nav><ul><li class=nav-><a href=https://lamendola.me/about/><span>About</span></a></li><li class=nav-blog><a href=https://lamendola.me/blog/><span>Blog</span></a></li><li class=nav-><a href=https://ip.lamendola.me/><span>What's my IP?</span></a></li><li class=nav-><a href=https://1a4.fr/><span>Encrypted Pastebin</span></a></li></ul></nav></div></div></section><section class=icons><div class=container><div class=content><a href=https://github.com/vt0r target=_blank rel=noopener><img class=icon src=/img/github.svg alt=github></a>
 <a href=https://keybase.io/vt0r target=_blank rel=noopener><img class=icon src=/img/keybase.svg alt=keybase></a>
 <a href=https://www.linkedin.com/in/salvatorelamendola target=_blank rel=noopener><img class=icon src=/img/linkedin.svg alt=linkedin></a>
-<a href=mailto:salvatore[at@@]lamendola[dot..]me><img class=icon src=/img/email.svg alt=email></a></div></div></section><section class="main post non-narrow zero-top-spacing"><div class=container><div class=content><div class=front-matter><div class=title-container><div class=page-heading>Generating Random Passwords in Perl</div><div class=initials><a href=https://lamendola.me></a></div></div><div class=meta><div class=date title="Sun Apr 28 2013 21:19:40 UTC">Apr 28, 2013</div><div class=reading-time><div class=middot></div>3 minutes read</div></div></div><div class=markdown><p>Though I&rsquo;ve already created the same thing in another post using a Bash function, I had a very important need for a Perl script that produced random strings. Once I got that little script working, I decided to rewrite the original Bash password generator function entirely in Perl. This may not be the most efficient way to hack it up, but I&rsquo;m no Perl monger, so don&rsquo;t expect perfection. This script does work well, however, and requires no additional modules, so it can be run anywhere there is a Perl interpreter.</p><div class=highlight><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:2;-o-tab-size:2;tab-size:2><code class=language-perl data-lang=perl><span style=color:#586e75>#!/usr/bin/perl -w</span>
+<a href=mailto:salvatore[at@@]lamendola[dot..]me><img class=icon src=/img/email.svg alt=email></a></div></div></section><section class="main post non-narrow zero-top-spacing"><div class=container><div class=content><div class=front-matter><div class=title-container><div class=page-heading>Generating Random Passwords in Perl</div><div class=initials><a href=https://lamendola.me></a></div></div><div class=meta><div class=date title="Sun Apr 28 2013 21:19:40 UTC">Apr 28, 2013</div><div class=reading-time><div class=middot></div>3 minutes read</div></div></div><div class=markdown><p>Though I&rsquo;ve already created the same thing in another post using a Bash function, I had a very important need for a Perl script that produced random strings. Once I got that little script working, I decided to rewrite the original Bash password generator function entirely in Perl. This may not be the most efficient way to hack it up, but I&rsquo;m no Perl monger, so don&rsquo;t expect perfection. This script does work well, however, and requires no additional modules, so it can be run anywhere there is a Perl interpreter.</p><div class=highlight><pre class=chroma><code class=language-perl data-lang=perl><span class=ch>#!/usr/bin/perl -w</span>
 
-<span style=color:#719e07>use</span> warnings;
-<span style=color:#719e07>use</span> strict;
+<span class=k>use</span> <span class=nn>warnings</span><span class=p>;</span>
+<span class=k>use</span> <span class=nn>strict</span><span class=p>;</span>
 
-<span style=color:#586e75># Default length/number</span>
-<span style=color:#719e07>my</span> <span style=color:#268bd2>$len</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>19</span>;
-<span style=color:#719e07>my</span> <span style=color:#268bd2>$num</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>1</span>;
+<span class=c1># Default length/number</span>
+<span class=k>my</span> <span class=nv>$len</span> <span class=o>=</span> <span class=mi>19</span><span class=p>;</span>
+<span class=k>my</span> <span class=nv>$num</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
 
-<span style=color:#586e75># Custom definition for safe symbols</span>
-<span style=color:#719e07>my</span> <span style=color:#268bd2>@symbols</span> <span style=color:#719e07>=</span> (<span style=color:#2aa198>&#39;-&#39;</span>, <span style=color:#2aa198>&#39;_&#39;</span>, <span style=color:#2aa198>&#39;!&#39;</span>, <span style=color:#2aa198>&#39;@&#39;</span>, <span style=color:#2aa198>&#39;#&#39;</span>, <span style=color:#2aa198>&#39;$&#39;</span>, <span style=color:#2aa198>&#39;%&#39;</span>, <span style=color:#2aa198>&#39;^&#39;</span>, <span style=color:#2aa198>&#39;&amp;&#39;</span>, <span style=color:#2aa198>&#39;*&#39;</span>, <span style=color:#2aa198>&#39;/&#39;</span>, <span style=color:#2aa198>&#39;\\&#39;</span>, <span style=color:#2aa198>&#39;(&#39;</span>, <span style=color:#2aa198>&#39;)&#39;</span>, <span style=color:#2aa198>&#39;_&#39;</span>, <span style=color:#2aa198>&#39;+&#39;</span>, <span style=color:#2aa198>&#39;{&#39;</span>, <span style=color:#2aa198>&#39;}&#39;</span>, <span style=color:#2aa198>&#39;|&#39;</span>, <span style=color:#2aa198>&#39;:&#39;</span>, <span style=color:#2aa198>&#39;&lt;&#39;</span>, <span style=color:#2aa198>&#39;&gt;&#39;</span>, <span style=color:#2aa198>&#39;?&#39;</span>, <span style=color:#2aa198>&#39;=&#39;</span>, <span style=color:#2aa198>&#39;A&#39;</span><span style=color:#719e07>..</span><span style=color:#2aa198>&#39;Z&#39;</span>, <span style=color:#2aa198>&#39;a&#39;</span><span style=color:#719e07>..</span><span style=color:#2aa198>&#39;z&#39;</span>, <span style=color:#2aa198>&#39;0&#39;</span><span style=color:#719e07>..</span><span style=color:#2aa198>&#39;9&#39;</span>);
+<span class=c1># Custom definition for safe symbols</span>
+<span class=k>my</span> <span class=nv>@symbols</span> <span class=o>=</span> <span class=p>(</span><span class=s>&#39;-&#39;</span><span class=p>,</span> <span class=s>&#39;_&#39;</span><span class=p>,</span> <span class=s>&#39;!&#39;</span><span class=p>,</span> <span class=s>&#39;@&#39;</span><span class=p>,</span> <span class=s>&#39;#&#39;</span><span class=p>,</span> <span class=s>&#39;$&#39;</span><span class=p>,</span> <span class=s>&#39;%&#39;</span><span class=p>,</span> <span class=s>&#39;^&#39;</span><span class=p>,</span> <span class=s>&#39;&amp;&#39;</span><span class=p>,</span> <span class=s>&#39;*&#39;</span><span class=p>,</span> <span class=s>&#39;/&#39;</span><span class=p>,</span> <span class=s>&#39;\\&#39;</span><span class=p>,</span> <span class=s>&#39;(&#39;</span><span class=p>,</span> <span class=s>&#39;)&#39;</span><span class=p>,</span> <span class=s>&#39;_&#39;</span><span class=p>,</span> <span class=s>&#39;+&#39;</span><span class=p>,</span> <span class=s>&#39;{&#39;</span><span class=p>,</span> <span class=s>&#39;}&#39;</span><span class=p>,</span> <span class=s>&#39;|&#39;</span><span class=p>,</span> <span class=s>&#39;:&#39;</span><span class=p>,</span> <span class=s>&#39;&lt;&#39;</span><span class=p>,</span> <span class=s>&#39;&gt;&#39;</span><span class=p>,</span> <span class=s>&#39;?&#39;</span><span class=p>,</span> <span class=s>&#39;=&#39;</span><span class=p>,</span> <span class=s>&#39;A&#39;</span><span class=o>..</span><span class=s>&#39;Z&#39;</span><span class=p>,</span> <span class=s>&#39;a&#39;</span><span class=o>..</span><span class=s>&#39;z&#39;</span><span class=p>,</span> <span class=s>&#39;0&#39;</span><span class=o>..</span><span class=s>&#39;9&#39;</span><span class=p>);</span>
 
-<span style=color:#586e75># Alphanumeric-only option</span>
-<span style=color:#719e07>my</span> <span style=color:#268bd2>@alphanumeric</span> <span style=color:#719e07>=</span> (<span style=color:#2aa198>&#39;A&#39;</span><span style=color:#719e07>..</span><span style=color:#2aa198>&#39;Z&#39;</span>, <span style=color:#2aa198>&#39;a&#39;</span><span style=color:#719e07>..</span><span style=color:#2aa198>&#39;z&#39;</span>, <span style=color:#2aa198>&#39;0&#39;</span><span style=color:#719e07>..</span><span style=color:#2aa198>&#39;9&#39;</span>);
+<span class=c1># Alphanumeric-only option</span>
+<span class=k>my</span> <span class=nv>@alphanumeric</span> <span class=o>=</span> <span class=p>(</span><span class=s>&#39;A&#39;</span><span class=o>..</span><span class=s>&#39;Z&#39;</span><span class=p>,</span> <span class=s>&#39;a&#39;</span><span class=o>..</span><span class=s>&#39;z&#39;</span><span class=p>,</span> <span class=s>&#39;0&#39;</span><span class=o>..</span><span class=s>&#39;9&#39;</span><span class=p>);</span>
 
-<span style=color:#586e75># Pull in args and list usage</span>
-<span style=color:#719e07>my</span> <span style=color:#268bd2>$numargs</span> <span style=color:#719e07>=</span> <span style=color:#b58900>scalar</span> <span style=color:#268bd2>@ARGV</span>; 
-    <span style=color:#719e07>if</span> (<span style=color:#268bd2>$numargs</span> <span style=color:#719e07>==</span> <span style=color:#2aa198>0</span> <span style=color:#719e07>||</span> <span style=color:#268bd2>$ARGV</span>[<span style=color:#2aa198>0</span>] <span style=color:#719e07>eq</span> <span style=color:#2aa198>&#34;-h&#34;</span>) {
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;Sal&#39;s Random Password Generator\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;-------------------------------\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;Usage: pwgen &lt;OPTIONS&gt; [length] [number] (length and number optional)\n\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;OPTIONS (MUST SPECIFY ONE!):\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;-s               Add symbols to output (NOT FOR MYSQL!)\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;-a               Alphanumeric only\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;-p               Generate phpMyAdmin Blowfish secret (for cookie auth)\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;-w               Generate Wordpress encryption keys (wp-config.php)\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;-h               Display this usage information\n\n&#34;</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;If no length or number are defined, a default length of $len and number of $num will be used.\n&#34;</span>;
-        <span style=color:#b58900>exit</span>(<span style=color:#2aa198>0</span>);
-    } 
+<span class=c1># Pull in args and list usage</span>
+<span class=k>my</span> <span class=nv>$numargs</span> <span class=o>=</span> <span class=nb>scalar</span> <span class=nv>@ARGV</span><span class=p>;</span> 
+    <span class=k>if</span> <span class=p>(</span><span class=nv>$numargs</span> <span class=o>==</span> <span class=mi>0</span> <span class=o>||</span> <span class=nv>$ARGV</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=ow>eq</span> <span class=s>&#34;-h&#34;</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>print</span> <span class=s>&#34;Sal&#39;s Random Password Generator\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;-------------------------------\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;Usage: pwgen &lt;OPTIONS&gt; [length] [number] (length and number optional)\n\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;OPTIONS (MUST SPECIFY ONE!):\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;-s               Add symbols to output (NOT FOR MYSQL!)\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;-a               Alphanumeric only\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;-p               Generate phpMyAdmin Blowfish secret (for cookie auth)\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;-w               Generate Wordpress encryption keys (wp-config.php)\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;-h               Display this usage information\n\n&#34;</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;If no length or number are defined, a default length of $len and number of $num will be used.\n&#34;</span><span class=p>;</span>
+        <span class=nb>exit</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+    <span class=p>}</span> 
 
-<span style=color:#719e07>my</span> <span style=color:#268bd2>$pwtype</span> <span style=color:#719e07>=</span> <span style=color:#268bd2>$ARGV</span>[<span style=color:#2aa198>0</span>];
+<span class=k>my</span> <span class=nv>$pwtype</span> <span class=o>=</span> <span class=nv>$ARGV</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>
 
-<span style=color:#719e07>if</span> (<span style=color:#b58900>defined</span> <span style=color:#268bd2>$ARGV</span>[<span style=color:#2aa198>1</span>] <span style=color:#719e07>&amp;&amp;</span> <span style=color:#268bd2>$ARGV</span>[<span style=color:#2aa198>1</span>] <span style=color:#719e07>=~</span><span style=color:#dc322f> /^\d+$/</span>) {
-    <span style=color:#268bd2>$len</span> <span style=color:#719e07>=</span> <span style=color:#268bd2>$ARGV</span>[<span style=color:#2aa198>1</span>];
-}
+<span class=k>if</span> <span class=p>(</span><span class=nb>defined</span> <span class=nv>$ARGV</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=nv>$ARGV</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span> <span class=o>=~</span><span class=sr> /^\d+$/</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nv>$len</span> <span class=o>=</span> <span class=nv>$ARGV</span><span class=p>[</span><span class=mi>1</span><span class=p>];</span>
+<span class=p>}</span>
 
-<span style=color:#719e07>if</span> (<span style=color:#b58900>defined</span> <span style=color:#268bd2>$ARGV</span>[<span style=color:#2aa198>2</span>] <span style=color:#719e07>&amp;&amp;</span> <span style=color:#268bd2>$ARGV</span>[<span style=color:#2aa198>2</span>] <span style=color:#719e07>=~</span><span style=color:#dc322f> /^\d+$/</span>) {
-    <span style=color:#268bd2>$num</span> <span style=color:#719e07>=</span> <span style=color:#268bd2>$ARGV</span>[<span style=color:#2aa198>2</span>];
-}
+<span class=k>if</span> <span class=p>(</span><span class=nb>defined</span> <span class=nv>$ARGV</span><span class=p>[</span><span class=mi>2</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=nv>$ARGV</span><span class=p>[</span><span class=mi>2</span><span class=p>]</span> <span class=o>=~</span><span class=sr> /^\d+$/</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nv>$num</span> <span class=o>=</span> <span class=nv>$ARGV</span><span class=p>[</span><span class=mi>2</span><span class=p>];</span>
+<span class=p>}</span>
 
-<span style=color:#719e07>if</span> (<span style=color:#268bd2>$pwtype</span> <span style=color:#719e07>eq</span> <span style=color:#2aa198>&#34;-s&#34;</span>) {
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$count</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>0</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass</span>;
-    <span style=color:#719e07>while</span> (<span style=color:#268bd2>$count</span> <span style=color:#719e07>&lt;</span> <span style=color:#268bd2>$num</span>) {
-        <span style=color:#268bd2>$pass</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-        <span style=color:#268bd2>$pass</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#268bd2>$len</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;$pass\n&#34;</span>;
-        <span style=color:#268bd2>$count</span><span style=color:#719e07>++</span>;
-    }
-}
+<span class=k>if</span> <span class=p>(</span><span class=nv>$pwtype</span> <span class=ow>eq</span> <span class=s>&#34;-s&#34;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>my</span> <span class=nv>$count</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass</span><span class=p>;</span>
+    <span class=k>while</span> <span class=p>(</span><span class=nv>$count</span> <span class=o>&lt;</span> <span class=nv>$num</span><span class=p>)</span> <span class=p>{</span>
+        <span class=nv>$pass</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+        <span class=nv>$pass</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=nv>$len</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;$pass\n&#34;</span><span class=p>;</span>
+        <span class=nv>$count</span><span class=o>++</span><span class=p>;</span>
+    <span class=p>}</span>
+<span class=p>}</span>
 
-<span style=color:#719e07>if</span> (<span style=color:#268bd2>$pwtype</span> <span style=color:#719e07>eq</span> <span style=color:#2aa198>&#34;-a&#34;</span>) {
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$count</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>0</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass</span>;
-    <span style=color:#719e07>while</span> (<span style=color:#268bd2>$count</span> <span style=color:#719e07>&lt;</span> <span style=color:#268bd2>$num</span>) {
-        <span style=color:#268bd2>$pass</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-        <span style=color:#268bd2>$pass</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$alphanumeric</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@alphanumeric</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#268bd2>$len</span>;
-        <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;$pass\n&#34;</span>;
-        <span style=color:#268bd2>$count</span><span style=color:#719e07>++</span>;
-    }
-}
+<span class=k>if</span> <span class=p>(</span><span class=nv>$pwtype</span> <span class=ow>eq</span> <span class=s>&#34;-a&#34;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>my</span> <span class=nv>$count</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass</span><span class=p>;</span>
+    <span class=k>while</span> <span class=p>(</span><span class=nv>$count</span> <span class=o>&lt;</span> <span class=nv>$num</span><span class=p>)</span> <span class=p>{</span>
+        <span class=nv>$pass</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+        <span class=nv>$pass</span> <span class=o>.=</span> <span class=nv>$alphanumeric</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@alphanumeric</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=nv>$len</span><span class=p>;</span>
+        <span class=k>print</span> <span class=s>&#34;$pass\n&#34;</span><span class=p>;</span>
+        <span class=nv>$count</span><span class=o>++</span><span class=p>;</span>
+    <span class=p>}</span>
+<span class=p>}</span>
 
-<span style=color:#719e07>if</span> (<span style=color:#268bd2>$pwtype</span> <span style=color:#719e07>eq</span> <span style=color:#2aa198>&#34;-p&#34;</span>) {
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#268bd2>$pass</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;$pass\n&#34;</span>;
-}
+<span class=k>if</span> <span class=p>(</span><span class=nv>$pwtype</span> <span class=ow>eq</span> <span class=s>&#34;-p&#34;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>my</span> <span class=nv>$pass</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=nv>$pass</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;$pass\n&#34;</span><span class=p>;</span>
+<span class=p>}</span>
 
-<span style=color:#719e07>if</span> (<span style=color:#268bd2>$pwtype</span> <span style=color:#719e07>eq</span> <span style=color:#2aa198>&#34;-w&#34;</span>) {
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass1</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass2</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass3</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass4</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass5</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass6</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass7</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#719e07>my</span> <span style=color:#268bd2>$pass8</span> <span style=color:#719e07>=</span> <span style=color:#2aa198>&#34;&#34;</span>;
-    <span style=color:#268bd2>$pass1</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;define(&#39;AUTH_KEY&#39;,\t\t&#39;$pass1&#39;);\n&#34;</span>;
-    <span style=color:#268bd2>$pass2</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;define(&#39;SECURE_AUTH_KEY&#39;,\t&#39;$pass2&#39;);\n&#34;</span>;
-    <span style=color:#268bd2>$pass3</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;define(&#39;LOGGED_IN_KEY&#39;,\t\t&#39;$pass3&#39;);\n&#34;</span>;
-    <span style=color:#268bd2>$pass4</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;define(&#39;NONCE_KEY&#39;,\t\t&#39;$pass4&#39;);\n&#34;</span>;
-    <span style=color:#268bd2>$pass5</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;define(&#39;AUTH_SALT&#39;,\t\t&#39;$pass5&#39;);\n&#34;</span>;
-    <span style=color:#268bd2>$pass6</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;define(&#39;SECURE_AUTH_SALT&#39;,\t&#39;$pass6&#39;);\n&#34;</span>;
-    <span style=color:#268bd2>$pass7</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;define(&#39;LOGGED_IN_SALT&#39;,\t&#39;$pass7&#39;);\n&#34;</span>;
-    <span style=color:#268bd2>$pass8</span> <span style=color:#719e07>.=</span> <span style=color:#268bd2>$symbols</span>[<span style=color:#b58900>rand</span> <span style=color:#268bd2>@symbols</span>] <span style=color:#719e07>for</span> <span style=color:#2aa198>1</span><span style=color:#719e07>..</span><span style=color:#2aa198>64</span>;
-    <span style=color:#719e07>print</span> <span style=color:#2aa198>&#34;define(&#39;NONCE_SALT&#39;,\t\t&#39;$pass8&#39;);\n&#34;</span>;
-}
+<span class=k>if</span> <span class=p>(</span><span class=nv>$pwtype</span> <span class=ow>eq</span> <span class=s>&#34;-w&#34;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>my</span> <span class=nv>$pass1</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass2</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass3</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass4</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass5</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass6</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass7</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=k>my</span> <span class=nv>$pass8</span> <span class=o>=</span> <span class=s>&#34;&#34;</span><span class=p>;</span>
+    <span class=nv>$pass1</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;define(&#39;AUTH_KEY&#39;,\t\t&#39;$pass1&#39;);\n&#34;</span><span class=p>;</span>
+    <span class=nv>$pass2</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;define(&#39;SECURE_AUTH_KEY&#39;,\t&#39;$pass2&#39;);\n&#34;</span><span class=p>;</span>
+    <span class=nv>$pass3</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;define(&#39;LOGGED_IN_KEY&#39;,\t\t&#39;$pass3&#39;);\n&#34;</span><span class=p>;</span>
+    <span class=nv>$pass4</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;define(&#39;NONCE_KEY&#39;,\t\t&#39;$pass4&#39;);\n&#34;</span><span class=p>;</span>
+    <span class=nv>$pass5</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;define(&#39;AUTH_SALT&#39;,\t\t&#39;$pass5&#39;);\n&#34;</span><span class=p>;</span>
+    <span class=nv>$pass6</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;define(&#39;SECURE_AUTH_SALT&#39;,\t&#39;$pass6&#39;);\n&#34;</span><span class=p>;</span>
+    <span class=nv>$pass7</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;define(&#39;LOGGED_IN_SALT&#39;,\t&#39;$pass7&#39;);\n&#34;</span><span class=p>;</span>
+    <span class=nv>$pass8</span> <span class=o>.=</span> <span class=nv>$symbols</span><span class=p>[</span><span class=nb>rand</span> <span class=nv>@symbols</span><span class=p>]</span> <span class=k>for</span> <span class=mi>1</span><span class=o>..</span><span class=mi>64</span><span class=p>;</span>
+    <span class=k>print</span> <span class=s>&#34;define(&#39;NONCE_SALT&#39;,\t\t&#39;$pass8&#39;);\n&#34;</span><span class=p>;</span>
+<span class=p>}</span>
 </code></pre></div><p>Save this as <code>salpwgen.pl</code> or whatever file name you choose. The first line allows you to make the file executable and run it as <code>./salpwgen.pl</code>, assuming your Perl interpreter is in <code>/usr/bin/perl</code>.</p><p>If you have any suggestions, or if you would like to see some other type of secret/hash generated, please feel free to comment below.</p><br><p class=back-to-posts><a href=/blog>Back to posts</a></p></div><br><div class=disqus></div></div></div></section></body></html>
