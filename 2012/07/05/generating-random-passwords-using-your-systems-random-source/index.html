@@ -2,87 +2,87 @@
 <a href=/><div class=name>SALVATORE LAMENDOLA (vt0r)</div></a><nav><ul><li class=nav-><a href=https://lamendola.me/about/><span>About</span></a></li><li class=nav-blog><a href=https://lamendola.me/blog/><span>Blog</span></a></li><li class=nav-><a href=https://ip.lamendola.me/><span>What's my IP?</span></a></li><li class=nav-><a href=https://1a4.fr/><span>Encrypted Pastebin</span></a></li></ul></nav></div></div></section><section class=icons><div class=container><div class=content><a href=https://github.com/vt0r target=_blank rel=noopener><img class=icon src=/img/github.svg alt=github></a>
 <a href=https://keybase.io/vt0r target=_blank rel=noopener><img class=icon src=/img/keybase.svg alt=keybase></a>
 <a href=https://www.linkedin.com/in/salvatorelamendola target=_blank rel=noopener><img class=icon src=/img/linkedin.svg alt=linkedin></a>
-<a href=mailto:salvatore[at@@]lamendola[dot..]me><img class=icon src=/img/email.svg alt=email></a></div></div></section><section class="main post non-narrow zero-top-spacing"><div class=container><div class=content><div class=front-matter><div class=title-container><div class=page-heading>Generating Random Passwords in Bash Using Your System's Random Source</div><div class=initials><a href=https://lamendola.me></a></div></div><div class=meta><div class=date title="Thu Jul 5 2012 09:30:21 UTC">Jul 5, 2012</div><div class=reading-time><div class=middot></div>4 minutes read</div></div></div><div class=markdown><p>Today, we will re-invent the wheel with a simple bash function to generate some passwords and a few hashes as well. Why would I bother coding something when several good programs already exist to perform the same functionality? Well, that&rsquo;s simple: I use this most on systems where I cannot install software. Any user that has SSH access can edit their own .bashrc , so I decided since random password generation is a daily task I perform at my job and elsewhere, it made sense to have a good way to generate passwords. There are a few hashes you can use this for as well. This function will generate the hash used for cookie authentication in phpMyAdmin and it will also generate the hashes used to secure authentication via Wordpress (to be used in wp-config.php). Paste this function in its entirety into your .bashrc or /etc/profile , /etc/bashrc , /etc/bash.bashrc (wherever you feel it should go):</p><div class=highlight><pre class=chroma><code class=language-bash data-lang=bash><span class=k>function</span> pwgen<span class=o>()</span> <span class=o>{</span>
-    <span class=k>case</span> <span class=s2>&#34;</span><span class=nv>$1</span><span class=s2>&#34;</span> in
-    -s<span class=p>|</span>--symbols<span class=o>)</span>
-        <span class=nb>export</span> <span class=nv>SYMBOLS</span><span class=o>=</span><span class=s2>&#34;1&#34;</span> <span class=nv>PHPMA</span><span class=o>=</span><span class=s2>&#34;0&#34;</span> <span class=nv>WORDPRESS</span><span class=o>=</span><span class=s2>&#34;0&#34;</span> <span class=nv>YUBIKEY</span><span class=o>=</span><span class=s2>&#34;0&#34;</span>
-    <span class=p>;;</span>
-    -a<span class=p>|</span>--alphanumeric<span class=o>)</span>
-        <span class=nb>export</span> <span class=nv>SYMBOLS</span><span class=o>=</span><span class=s2>&#34;0&#34;</span> <span class=nv>PHPMA</span><span class=o>=</span><span class=s2>&#34;0&#34;</span> <span class=nv>WORDPRESS</span><span class=o>=</span><span class=s2>&#34;0&#34;</span> <span class=nv>YUBIKEY</span><span class=o>=</span><span class=s2>&#34;0&#34;</span>
-    <span class=p>;;</span>
-    -p<span class=p>|</span>--phpmyadmin<span class=o>)</span>
-        <span class=nb>export</span> <span class=nv>PHPMA</span><span class=o>=</span><span class=s2>&#34;1&#34;</span> <span class=nv>WORDPRESS</span><span class=o>=</span><span class=s2>&#34;0&#34;</span> <span class=nv>YUBIKEY</span><span class=o>=</span><span class=s2>&#34;0&#34;</span>
-    <span class=p>;;</span>
-    -w<span class=p>|</span>--wordpress<span class=o>)</span>
-        <span class=nb>export</span> <span class=nv>WORDPRESS</span><span class=o>=</span><span class=s2>&#34;1&#34;</span> <span class=nv>PHPMA</span><span class=o>=</span><span class=s2>&#34;0&#34;</span> <span class=nv>YUBIKEY</span><span class=o>=</span><span class=s2>&#34;0&#34;</span>
-    <span class=p>;;</span>
-    -y<span class=p>|</span>--yubikey<span class=o>)</span>
-        <span class=nb>export</span> <span class=nv>YUBIKEY</span><span class=o>=</span><span class=s2>&#34;1&#34;</span> <span class=nv>PHPMA</span><span class=o>=</span><span class=s2>&#34;0&#34;</span> <span class=nv>WORDPRESS</span><span class=o>=</span><span class=s2>&#34;0&#34;</span>
-    <span class=p>;;</span>
-    -h<span class=p>|</span>--help<span class=p>|</span>*<span class=o>)</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;Usage: pwgen &lt;OPTIONS&gt; [length] [number] (length and number optional)&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;OPTIONS (MUST SPECIFY ONE!):&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;--symbols (-s)               Add symbols to output (NOT FOR MYSQL!)&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;--alphanumeric (-a)          Alphanumeric only&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;--phpmyadmin (-p)            Generate phpMyAdmin Blowfish secret (for cookie auth)&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;--wordpress (-w)             Generate Wordpress encryption keys (wp-config.php)&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;--yubikey (-y)               Generate Public/Private/Secret keys for Yubikey OTP&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;--help (-h)                  Display this usage information&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;&#34;</span>
-        <span class=nb>echo</span> <span class=s2>$&#34;If no length or number are defined, a default length of 19 and number of 1 will be used.&#34;</span>
-        <span class=k>return</span> <span class=m>1</span>
-    <span class=p>;;</span>
-    <span class=k>esac</span>
+<a href=mailto:salvatore[at@@]lamendola[dot..]me><img class=icon src=/img/email.svg alt=email></a></div></div></section><section class="main post non-narrow zero-top-spacing"><div class=container><div class=content><div class=front-matter><div class=title-container><div class=page-heading>Generating Random Passwords in Bash Using Your System's Random Source</div><div class=initials><a href=https://lamendola.me></a></div></div><div class=meta><div class=date title="Thu Jul 5 2012 09:30:21 UTC">Jul 5, 2012</div><div class=reading-time><div class=middot></div>4 minutes read</div></div></div><div class=markdown><p>Today, we will re-invent the wheel with a simple bash function to generate some passwords and a few hashes as well. Why would I bother coding something when several good programs already exist to perform the same functionality? Well, that&rsquo;s simple: I use this most on systems where I cannot install software. Any user that has SSH access can edit their own .bashrc , so I decided since random password generation is a daily task I perform at my job and elsewhere, it made sense to have a good way to generate passwords. There are a few hashes you can use this for as well. This function will generate the hash used for cookie authentication in phpMyAdmin and it will also generate the hashes used to secure authentication via Wordpress (to be used in wp-config.php). Paste this function in its entirety into your .bashrc or /etc/profile , /etc/bashrc , /etc/bash.bashrc (wherever you feel it should go):</p><div class=highlight><pre style=color:#93a1a1;background-color:#002b36;-moz-tab-size:2;-o-tab-size:2;tab-size:2><code class=language-bash data-lang=bash><span style=color:#719e07>function</span> pwgen<span style=color:#719e07>()</span> <span style=color:#719e07>{</span>
+    <span style=color:#719e07>case</span> <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$1</span><span style=color:#2aa198>&#34;</span> in
+    -s|--symbols<span style=color:#719e07>)</span>
+        <span style=color:#b58900>export</span> <span style=color:#268bd2>SYMBOLS</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;1&#34;</span> <span style=color:#268bd2>PHPMA</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span> <span style=color:#268bd2>WORDPRESS</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span> <span style=color:#268bd2>YUBIKEY</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span>
+    ;;
+    -a|--alphanumeric<span style=color:#719e07>)</span>
+        <span style=color:#b58900>export</span> <span style=color:#268bd2>SYMBOLS</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span> <span style=color:#268bd2>PHPMA</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span> <span style=color:#268bd2>WORDPRESS</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span> <span style=color:#268bd2>YUBIKEY</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span>
+    ;;
+    -p|--phpmyadmin<span style=color:#719e07>)</span>
+        <span style=color:#b58900>export</span> <span style=color:#268bd2>PHPMA</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;1&#34;</span> <span style=color:#268bd2>WORDPRESS</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span> <span style=color:#268bd2>YUBIKEY</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span>
+    ;;
+    -w|--wordpress<span style=color:#719e07>)</span>
+        <span style=color:#b58900>export</span> <span style=color:#268bd2>WORDPRESS</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;1&#34;</span> <span style=color:#268bd2>PHPMA</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span> <span style=color:#268bd2>YUBIKEY</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span>
+    ;;
+    -y|--yubikey<span style=color:#719e07>)</span>
+        <span style=color:#b58900>export</span> <span style=color:#268bd2>YUBIKEY</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;1&#34;</span> <span style=color:#268bd2>PHPMA</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span> <span style=color:#268bd2>WORDPRESS</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;0&#34;</span>
+    ;;
+    -h|--help|*<span style=color:#719e07>)</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;Usage: pwgen &lt;OPTIONS&gt; [length] [number] (length and number optional)&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;OPTIONS (MUST SPECIFY ONE!):&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;--symbols (-s)               Add symbols to output (NOT FOR MYSQL!)&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;--alphanumeric (-a)          Alphanumeric only&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;--phpmyadmin (-p)            Generate phpMyAdmin Blowfish secret (for cookie auth)&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;--wordpress (-w)             Generate Wordpress encryption keys (wp-config.php)&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;--yubikey (-y)               Generate Public/Private/Secret keys for Yubikey OTP&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;--help (-h)                  Display this usage information&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;&#34;</span>
+        <span style=color:#b58900>echo</span> <span style=color:#2aa198>$&#34;If no length or number are defined, a default length of 19 and number of 1 will be used.&#34;</span>
+        <span style=color:#719e07>return</span> <span style=color:#2aa198>1</span>
+    ;;
+    <span style=color:#719e07>esac</span>
 
-<span class=k>if</span> <span class=o>[</span> -z <span class=s2>&#34;</span><span class=nv>$2</span><span class=s2>&#34;</span> <span class=o>]</span>
-<span class=k>then</span>
-     <span class=nb>export</span> <span class=nv>LEN</span><span class=o>=</span><span class=s2>&#34;19&#34;</span>
-<span class=k>else</span>
-     <span class=nb>export</span> <span class=nv>LEN</span><span class=o>=</span><span class=s2>&#34;</span><span class=nv>$2</span><span class=s2>&#34;</span>
-<span class=k>fi</span>
+<span style=color:#719e07>if</span> <span style=color:#719e07>[</span> -z <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$2</span><span style=color:#2aa198>&#34;</span> <span style=color:#719e07>]</span>
+<span style=color:#719e07>then</span>
+     <span style=color:#b58900>export</span> <span style=color:#268bd2>LEN</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;19&#34;</span>
+<span style=color:#719e07>else</span>
+     <span style=color:#b58900>export</span> <span style=color:#268bd2>LEN</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$2</span><span style=color:#2aa198>&#34;</span>
+<span style=color:#719e07>fi</span>
 
-<span class=k>if</span> <span class=o>[</span> -z <span class=s2>&#34;</span><span class=nv>$3</span><span class=s2>&#34;</span> <span class=o>]</span>
-<span class=k>then</span>
-     <span class=nb>export</span> <span class=nv>NUM</span><span class=o>=</span><span class=s2>&#34;1&#34;</span>
-<span class=k>else</span>
-     <span class=nb>export</span> <span class=nv>NUM</span><span class=o>=</span><span class=s2>&#34;</span><span class=nv>$3</span><span class=s2>&#34;</span>
-<span class=k>fi</span>
+<span style=color:#719e07>if</span> <span style=color:#719e07>[</span> -z <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$3</span><span style=color:#2aa198>&#34;</span> <span style=color:#719e07>]</span>
+<span style=color:#719e07>then</span>
+     <span style=color:#b58900>export</span> <span style=color:#268bd2>NUM</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;1&#34;</span>
+<span style=color:#719e07>else</span>
+     <span style=color:#b58900>export</span> <span style=color:#268bd2>NUM</span><span style=color:#719e07>=</span><span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$3</span><span style=color:#2aa198>&#34;</span>
+<span style=color:#719e07>fi</span>
 
-<span class=k>if</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$PHPMA</span><span class=s2>&#34;</span> <span class=o>==</span> <span class=s2>&#34;1&#34;</span> <span class=o>]</span>
-<span class=k>then</span>
-     tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>46</span> <span class=p>|</span> head -n <span class=m>1</span>
-     <span class=k>return</span> <span class=m>0</span>
-<span class=k>elif</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$WORDPRESS</span><span class=s2>&#34;</span> <span class=o>==</span> <span class=s2>&#34;1&#34;</span> <span class=o>]</span>
-<span class=k>then</span>
-     <span class=nv>WP1</span><span class=o>=</span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>64</span> <span class=p>|</span> head -n 1<span class=k>)</span>
-     <span class=nv>WP2</span><span class=o>=</span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>64</span> <span class=p>|</span> head -n 1<span class=k>)</span>
-     <span class=nv>WP3</span><span class=o>=</span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>64</span> <span class=p>|</span> head -n 1<span class=k>)</span>
-     <span class=nv>WP4</span><span class=o>=</span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>64</span> <span class=p>|</span> head -n 1<span class=k>)</span>
-     <span class=nv>WP5</span><span class=o>=</span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>64</span> <span class=p>|</span> head -n 1<span class=k>)</span>
-     <span class=nv>WP6</span><span class=o>=</span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>64</span> <span class=p>|</span> head -n 1<span class=k>)</span>
-     <span class=nv>WP7</span><span class=o>=</span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>64</span> <span class=p>|</span> head -n 1<span class=k>)</span>
-     <span class=nv>WP8</span><span class=o>=</span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>64</span> <span class=p>|</span> head -n 1<span class=k>)</span>
-     <span class=nb>echo</span> <span class=s2>&#34;define(&#39;AUTH_KEY&#39;,         &#39;</span><span class=nv>$WP1</span><span class=s2>&#39;);&#34;</span>
-     <span class=nb>echo</span> <span class=s2>&#34;define(&#39;SECURE_AUTH_KEY&#39;,  &#39;</span><span class=nv>$WP2</span><span class=s2>&#39;);&#34;</span>
-     <span class=nb>echo</span> <span class=s2>&#34;define(&#39;LOGGED_IN_KEY&#39;,    &#39;</span><span class=nv>$WP3</span><span class=s2>&#39;);&#34;</span>
-     <span class=nb>echo</span> <span class=s2>&#34;define(&#39;NONCE_KEY&#39;,        &#39;</span><span class=nv>$WP4</span><span class=s2>&#39;);&#34;</span>
-     <span class=nb>echo</span> <span class=s2>&#34;define(&#39;AUTH_SALT&#39;,        &#39;</span><span class=nv>$WP5</span><span class=s2>&#39;);&#34;</span>
-     <span class=nb>echo</span> <span class=s2>&#34;define(&#39;SECURE_AUTH_SALT&#39;, &#39;</span><span class=nv>$WP6</span><span class=s2>&#39;);&#34;</span>
-     <span class=nb>echo</span> <span class=s2>&#34;define(&#39;LOGGED_IN_SALT&#39;,   &#39;</span><span class=nv>$WP7</span><span class=s2>&#39;);&#34;</span>
-     <span class=nb>echo</span> <span class=s2>&#34;define(&#39;NONCE_SALT&#39;,       &#39;</span><span class=nv>$WP8</span><span class=s2>&#39;);&#34;</span>
-     <span class=k>return</span> <span class=m>0</span>
-<span class=k>elif</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$YUBIKEY</span><span class=s2>&#34;</span> <span class=o>==</span> <span class=s2>&#34;1&#34;</span> <span class=o>]</span>
-<span class=k>then</span>
-     <span class=c1>#echo &#34;Public Identity: vv$(tr -dc &#39;a-f0-9&#39; &lt; /dev/random | fold -w 10 | head -n 1 | tr &#34;[0123456789abcdef]&#34; &#34;[cbdefghijklnrtuv]&#34;)&#34;</span>
-     <span class=c1>#echo &#34;Private Identity: $(tr -dc &#39;a-f0-9&#39; &lt; /dev/random | fold -w 12 | head -n 1)&#34;</span>
-     <span class=c1>#echo &#34;Secret Key: $(tr -dc &#39;a-f0-9&#39; &lt; /dev/random | fold -w 32 | head -n 1)&#34;</span>
-     <span class=nb>echo</span> <span class=s2>&#34;OTP AES Key: </span><span class=k>$(</span>tr -dc <span class=s1>&#39;a-f0-9&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=m>40</span> <span class=p>|</span> head -n 1<span class=k>)</span><span class=s2>&#34;</span>
-<span class=k>elif</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$SYMBOLS</span><span class=s2>&#34;</span> <span class=o>==</span> <span class=s2>&#34;1&#34;</span> <span class=o>]</span>
-<span class=k>then</span>
-     tr -dc <span class=s1>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=s2>&#34;</span><span class=nv>$LEN</span><span class=s2>&#34;</span> <span class=p>|</span> head -n <span class=s2>&#34;</span><span class=nv>$NUM</span><span class=s2>&#34;</span>
-<span class=k>else</span>
-     tr -dc <span class=s1>&#39;a-zA-Z0-9&#39;</span> &lt; /dev/random <span class=p>|</span> fold -w <span class=s2>&#34;</span><span class=nv>$LEN</span><span class=s2>&#34;</span> <span class=p>|</span> head -n <span class=s2>&#34;</span><span class=nv>$NUM</span><span class=s2>&#34;</span>
-<span class=k>fi</span>
-<span class=o>}</span>
+<span style=color:#719e07>if</span> <span style=color:#719e07>[</span> <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$PHPMA</span><span style=color:#2aa198>&#34;</span> <span style=color:#719e07>==</span> <span style=color:#2aa198>&#34;1&#34;</span> <span style=color:#719e07>]</span>
+<span style=color:#719e07>then</span>
+     tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>46</span> | head -n <span style=color:#2aa198>1</span>
+     <span style=color:#719e07>return</span> <span style=color:#2aa198>0</span>
+<span style=color:#719e07>elif</span> <span style=color:#719e07>[</span> <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$WORDPRESS</span><span style=color:#2aa198>&#34;</span> <span style=color:#719e07>==</span> <span style=color:#2aa198>&#34;1&#34;</span> <span style=color:#719e07>]</span>
+<span style=color:#719e07>then</span>
+     <span style=color:#268bd2>WP1</span><span style=color:#719e07>=</span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>64</span> | head -n 1<span style=color:#719e07>)</span>
+     <span style=color:#268bd2>WP2</span><span style=color:#719e07>=</span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>64</span> | head -n 1<span style=color:#719e07>)</span>
+     <span style=color:#268bd2>WP3</span><span style=color:#719e07>=</span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>64</span> | head -n 1<span style=color:#719e07>)</span>
+     <span style=color:#268bd2>WP4</span><span style=color:#719e07>=</span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>64</span> | head -n 1<span style=color:#719e07>)</span>
+     <span style=color:#268bd2>WP5</span><span style=color:#719e07>=</span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>64</span> | head -n 1<span style=color:#719e07>)</span>
+     <span style=color:#268bd2>WP6</span><span style=color:#719e07>=</span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>64</span> | head -n 1<span style=color:#719e07>)</span>
+     <span style=color:#268bd2>WP7</span><span style=color:#719e07>=</span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>64</span> | head -n 1<span style=color:#719e07>)</span>
+     <span style=color:#268bd2>WP8</span><span style=color:#719e07>=</span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>64</span> | head -n 1<span style=color:#719e07>)</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;define(&#39;AUTH_KEY&#39;,         &#39;</span><span style=color:#268bd2>$WP1</span><span style=color:#2aa198>&#39;);&#34;</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;define(&#39;SECURE_AUTH_KEY&#39;,  &#39;</span><span style=color:#268bd2>$WP2</span><span style=color:#2aa198>&#39;);&#34;</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;define(&#39;LOGGED_IN_KEY&#39;,    &#39;</span><span style=color:#268bd2>$WP3</span><span style=color:#2aa198>&#39;);&#34;</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;define(&#39;NONCE_KEY&#39;,        &#39;</span><span style=color:#268bd2>$WP4</span><span style=color:#2aa198>&#39;);&#34;</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;define(&#39;AUTH_SALT&#39;,        &#39;</span><span style=color:#268bd2>$WP5</span><span style=color:#2aa198>&#39;);&#34;</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;define(&#39;SECURE_AUTH_SALT&#39;, &#39;</span><span style=color:#268bd2>$WP6</span><span style=color:#2aa198>&#39;);&#34;</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;define(&#39;LOGGED_IN_SALT&#39;,   &#39;</span><span style=color:#268bd2>$WP7</span><span style=color:#2aa198>&#39;);&#34;</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;define(&#39;NONCE_SALT&#39;,       &#39;</span><span style=color:#268bd2>$WP8</span><span style=color:#2aa198>&#39;);&#34;</span>
+     <span style=color:#719e07>return</span> <span style=color:#2aa198>0</span>
+<span style=color:#719e07>elif</span> <span style=color:#719e07>[</span> <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$YUBIKEY</span><span style=color:#2aa198>&#34;</span> <span style=color:#719e07>==</span> <span style=color:#2aa198>&#34;1&#34;</span> <span style=color:#719e07>]</span>
+<span style=color:#719e07>then</span>
+     <span style=color:#586e75>#echo &#34;Public Identity: vv$(tr -dc &#39;a-f0-9&#39; &lt; /dev/random | fold -w 10 | head -n 1 | tr &#34;[0123456789abcdef]&#34; &#34;[cbdefghijklnrtuv]&#34;)&#34;</span>
+     <span style=color:#586e75>#echo &#34;Private Identity: $(tr -dc &#39;a-f0-9&#39; &lt; /dev/random | fold -w 12 | head -n 1)&#34;</span>
+     <span style=color:#586e75>#echo &#34;Secret Key: $(tr -dc &#39;a-f0-9&#39; &lt; /dev/random | fold -w 32 | head -n 1)&#34;</span>
+     <span style=color:#b58900>echo</span> <span style=color:#2aa198>&#34;OTP AES Key: </span><span style=color:#719e07>$(</span>tr -dc <span style=color:#2aa198>&#39;a-f0-9&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>40</span> | head -n 1<span style=color:#719e07>)</span><span style=color:#2aa198>&#34;</span>
+<span style=color:#719e07>elif</span> <span style=color:#719e07>[</span> <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$SYMBOLS</span><span style=color:#2aa198>&#34;</span> <span style=color:#719e07>==</span> <span style=color:#2aa198>&#34;1&#34;</span> <span style=color:#719e07>]</span>
+<span style=color:#719e07>then</span>
+     tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9-_!@#$%^&amp;*/\()_+{}|:&lt;&gt;?=&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$LEN</span><span style=color:#2aa198>&#34;</span> | head -n <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$NUM</span><span style=color:#2aa198>&#34;</span>
+<span style=color:#719e07>else</span>
+     tr -dc <span style=color:#2aa198>&#39;a-zA-Z0-9&#39;</span> &lt; /dev/random | fold -w <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$LEN</span><span style=color:#2aa198>&#34;</span> | head -n <span style=color:#2aa198>&#34;</span><span style=color:#268bd2>$NUM</span><span style=color:#2aa198>&#34;</span>
+<span style=color:#719e07>fi</span>
+<span style=color:#719e07>}</span>
 </code></pre></div><p>Now, you can name this whatever you like. There is already a very good program called pwgen which I use quite often, so on my system, this is actually called &lsquo;salpwgen&rsquo; to avoid conflicts. Once you have saved this function into your .bashrc, you just need to run the following command to read from .bashrc:</p><p>You may notice we&rsquo;re using /dev/random as the random source. This may cause blocking and take long amounts of time if you don&rsquo;t have sufficient entropy available. You have two choices in this situation:</p><ol><li>You can install an amazing piece of software known as haveged which will automatically push random data into /dev/random which passes all FIPS tests.</li><li>You can use /dev/urandom, which is a non-blocking source, but can contain repeats of previously used data (that&rsquo;s how it prevents from blocking).</li></ol><p>The choice is yours, but haveged is highly recommended as you never know when you will need randomness!</p><p>If you have any suggestions on ways I can improve my simple password generator, please feel free to leave a comment and I might consider adding a particular password or hash type.</p><br><p class=back-to-posts><a href=/blog>Back to posts</a></p></div><br><div class=disqus></div></div></div></section></body></html>
