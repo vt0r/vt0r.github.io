@@ -1,87 +1,15 @@
-<!doctype html><html lang=en-us>
-<head>
-<meta charset=utf-8>
-<meta http-equiv=x-ua-compatible content="chrome=1">
-<meta name=HandheldFriendly content="True">
-<meta name=MobileOptimized content="320">
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=referrer content="no-referrer">
-<meta name=author content="SALVATORE LAMENDOLA (vt0r)">
-<meta name=description content="Just did a high availability cluster setup a few weeks ago and though the web servers use the traditional heartbeat/ldirectord setup, there needed to be high availability between the two master/master database servers as well.
+<!doctype html><html lang=en-us><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="chrome=1"><meta name=HandheldFriendly content="True"><meta name=MobileOptimized content="320"><meta name=viewport content="width=device-width,initial-scale=1"><meta name=referrer content="no-referrer"><meta name=author content="SALVATORE LAMENDOLA (vt0r)"><meta name=description content="Just did a high availability cluster setup a few weeks ago and though the web servers use the traditional heartbeat/ldirectord setup, there needed to be high availability between the two master/master database servers as well.
 Yes, this can be done with ldirectord for MySQL, but if you also have other services like Memcached, or Redis, etc, you may just want to share a VIP between the servers.
-This is especially true if you&rsquo;re connecting to these servers internally.">
-<meta property="og:title" content="Using Heartbeat to Share a Single Virtual IP (VIP) Between Two Servers">
-<meta property="og:description" content="Just did a high availability cluster setup a few weeks ago and though the web servers use the traditional heartbeat/ldirectord setup, there needed to be high availability between the two master/master database servers as well.
+This is especially true if you&rsquo;re connecting to these servers internally."><meta property="og:title" content="Using Heartbeat to Share a Single Virtual IP (VIP) Between Two Servers"><meta property="og:description" content="Just did a high availability cluster setup a few weeks ago and though the web servers use the traditional heartbeat/ldirectord setup, there needed to be high availability between the two master/master database servers as well.
 Yes, this can be done with ldirectord for MySQL, but if you also have other services like Memcached, or Redis, etc, you may just want to share a VIP between the servers.
-This is especially true if you&rsquo;re connecting to these servers internally.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://lamendo.la/2012/05/05/using-heartbeat-to-share-a-single-virtual-ip-vip-between-two-servers/"><meta property="article:section" content="blog">
-<meta property="article:published_time" content="2012-05-05T10:45:08+00:00">
-<meta property="article:modified_time" content="2012-05-05T10:45:08+00:00">
-<title>
-Using Heartbeat to Share a Single Virtual IP (VIP) Between Two Servers
-</title>
-<link rel=canonical href=https://lamendo.la/2012/05/05/using-heartbeat-to-share-a-single-virtual-ip-vip-between-two-servers/>
-<link rel=preload href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Source+Sans+Pro:400&display=swap" as=style onload="this.onload=null,this.rel='stylesheet'">
-<link rel=stylesheet href=/css/reset.css>
-<link rel=preload href=/css/pygments.css as=style onload="this.onload=null,this.rel='stylesheet'">
-<link rel=stylesheet href=/css/main.css>
-<link rel="shortcut icon" href=/images/favicon.ico>
-</head>
-<body lang=en>
-<section class=header>
-<div class=container>
-<div class=content>
-<a href=/><img class=avatar src=/images/avatar@2x.png srcset="https://lamendo.la/images/avatar@2x.png 1x"></a>
-<a href=/><div class=name>SALVATORE LAMENDOLA (vt0r)</div></a>
-<nav>
-<ul>
-<li class=nav-><a href=https://lamendo.la/about/><span>About</span></a></li>
-<li class=nav-blog><a href=https://lamendo.la/blog/><span>Blog</span></a></li>
-<li class=nav-><a href=https://ip.1a4.fr/ target=_blank rel=noopener><span>What's my IP?</span></a></li>
-<li class=nav-><a href=https://1a4.fr/ target=_blank rel=noopener><span>Encrypted Pastebin</span></a></li>
-</ul>
-</nav>
-</div>
-</div>
-</section>
-<section class=icons>
-<div class=container>
-<div class=content>
-<a href=https://github.com/vt0r target=_blank rel=noopener><img class=icon src=/img/github.svg alt=github></a>
+This is especially true if you&rsquo;re connecting to these servers internally."><meta property="og:type" content="article"><meta property="og:url" content="https://lamendo.la/2012/05/05/using-heartbeat-to-share-a-single-virtual-ip-vip-between-two-servers/"><meta property="article:section" content="blog"><meta property="article:published_time" content="2012-05-05T10:45:08+00:00"><meta property="article:modified_time" content="2012-05-05T10:45:08+00:00"><title>Using Heartbeat to Share a Single Virtual IP (VIP) Between Two Servers</title><link rel=canonical href=https://lamendo.la/2012/05/05/using-heartbeat-to-share-a-single-virtual-ip-vip-between-two-servers/><link rel=preload href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Source+Sans+Pro:400&display=swap" as=style onload='this.onload=null,this.rel="stylesheet"'><link rel=stylesheet href=/css/reset.css><link rel=preload href=/css/pygments.css as=style onload='this.onload=null,this.rel="stylesheet"'><link rel=stylesheet href=/css/main.css><link rel="shortcut icon" href=/images/favicon.ico></head><body lang=en><section class=header><div class=container><div class=content><a href=/><img class=avatar src=/images/avatar@2x.png srcset="https://lamendo.la/images/avatar@2x.png 1x"></a>
+<a href=/><div class=name>SALVATORE LAMENDOLA (vt0r)</div></a><nav><ul><li class=nav-><a href=https://lamendo.la/about/><span>About</span></a></li><li class=nav-blog><a href=https://lamendo.la/blog/><span>Blog</span></a></li><li class=nav-><a href=https://ip.1a4.fr/ target=_blank rel=noopener><span>What's my IP?</span></a></li><li class=nav-><a href=https://1a4.fr/ target=_blank rel=noopener><span>Encrypted Pastebin</span></a></li></ul></nav></div></div></section><section class=icons><div class=container><div class=content><a href=https://github.com/vt0r target=_blank rel=noopener><img class=icon src=/img/github.svg alt=github></a>
+<a href=https://noc.social/@vt0r target=_blank rel=me><img class=icon src=/img/mastodon.svg alt=mastodon></a>
 <a href=https://www.linkedin.com/in/salvatorelamendola target=_blank rel=noopener><img class=icon src=/img/linkedin.svg alt=linkedin></a>
-<a href=mailto:salvatore[at@@]lamendo[dot..]la><img class=icon src=/img/email.svg alt=email></a>
-</div>
-</div>
-</section>
-<section class="main post non-narrow zero-top-spacing">
-<div class=container>
-<div class=content>
-<div class=front-matter>
-<div class=title-container>
-<div class=page-heading>
-Using Heartbeat to Share a Single Virtual IP (VIP) Between Two Servers
-</div>
-<div class=initials><a href=https://lamendo.la></a></div>
-</div>
-<div class=meta>
-<div class=date title="Sat May 5 2012 10:45:08 UTC">May 5, 2012</div>
-<div class=reading-time><div class=middot></div>2 minutes read</div>
-</div>
-</div>
-<div class=markdown>
-<p>Just did a high availability cluster setup a few weeks ago and though the web servers use the traditional heartbeat/ldirectord setup, there needed to be high availability between the two master/master database servers as well.</p>
-<p>Yes, this can be done with ldirectord for MySQL, but if you also have other services like Memcached, or Redis, etc, you may just want to share a VIP between the servers.</p>
-<p>This is especially true if you&rsquo;re connecting to these servers internally. Connecting via the VIP will only connect to one server, so this is not a load-balancing setup, but rather simply a high availability solution (failover).</p>
-<p>You just need to install heartbeat and add lines in /etc/hosts with each node&rsquo;s real address (so they can talk to each other without DNS lookups and also so they use the right interface if it&rsquo;s an actual resolving hostname that routes to a different one). Then configure the following files in /etc/ha.d:</p>
-<p><strong>authkeys:</strong></p>
-<pre>
+<a href=mailto:salvatore[at@@]lamendo[dot..]la><img class=icon src=/img/email.svg alt=email></a></div></div></section><section class="main post non-narrow zero-top-spacing"><div class=container><div class=content><div class=front-matter><div class=title-container><div class=page-heading>Using Heartbeat to Share a Single Virtual IP (VIP) Between Two Servers</div><div class=initials><a href=https://lamendo.la></a></div></div><div class=meta><div class=date title='Sat May 5 2012 10:45:08 UTC'>May 5, 2012</div><div class=reading-time><div class=middot></div>2 minutes read</div></div></div><div class=markdown><p>Just did a high availability cluster setup a few weeks ago and though the web servers use the traditional heartbeat/ldirectord setup, there needed to be high availability between the two master/master database servers as well.</p><p>Yes, this can be done with ldirectord for MySQL, but if you also have other services like Memcached, or Redis, etc, you may just want to share a VIP between the servers.</p><p>This is especially true if you&rsquo;re connecting to these servers internally. Connecting via the VIP will only connect to one server, so this is not a load-balancing setup, but rather simply a high availability solution (failover).</p><p>You just need to install heartbeat and add lines in /etc/hosts with each node&rsquo;s real address (so they can talk to each other without DNS lookups and also so they use the right interface if it&rsquo;s an actual resolving hostname that routes to a different one). Then configure the following files in /etc/ha.d:</p><p><strong>authkeys:</strong></p><pre>
 auth 1
 1 sha1 SoMeSeCrEtYoUcAnUsEtOkEePsAfE
-</pre>
-<p>This is just a key that authenticates other hosts. It must remain the same between all servers.</p>
-<p><strong>ha.cf:</strong></p>
-<pre>
+</pre><p>This is just a key that authenticates other hosts. It must remain the same between all servers.</p><p><strong>ha.cf:</strong></p><pre>
 logfacility     local0
 auto_failback on
 keepalive 2
@@ -90,30 +18,6 @@ udpport 694
 ucast eth0 db2.yourhostname.com
 node    db1.yourhostname.com
 node    db2.yourhostname.com
-</pre>
-<p>Here you specify options that determine things such as:</p>
-<ul>
-<li>Automatically falling back to first host (auto_failback)</li>
-<li>Delay between heartbeats (keepalive)</li>
-<li>Amount of failed heartbeat time before server takes the IP (deadtime)</li>
-<li>Port to connect on - no reason to change this (udpport)</li>
-<li>Host to look for and what interface to use to connect (ucast)</li>
-<li>Nodes within the cluster (can also be specified on one line for ugly configs)</li>
-</ul>
-<strong>haresources:</strong>
-<pre>
+</pre><p>Here you specify options that determine things such as:</p><ul><li>Automatically falling back to first host (auto_failback)</li><li>Delay between heartbeats (keepalive)</li><li>Amount of failed heartbeat time before server takes the IP (deadtime)</li><li>Port to connect on - no reason to change this (udpport)</li><li>Host to look for and what interface to use to connect (ucast)</li><li>Nodes within the cluster (can also be specified on one line for ugly configs)</li></ul><strong>haresources:</strong><pre>
 db1.yourhostname.com 200.200.200.200/26/eth0
-</pre>
-This file should match on both hosts and contains the hostname (uname -n) of the main server followed by the shared IP (VIP)/prefix/interface. Normally, you include the actual resource which should be monitored at the end of the line. Since you're just moving an IP back and forth for this setup, you can leave the last field blank.
-<p><strong>NOTE: Don&rsquo;t forget to make your services listen on 0.0.0.0 !</strong></p>
-<br>
-<p class=back-to-posts><a href=/blog>Back to posts</a></p>
-</div>
-<br>
-<div class=disqus>
-</div>
-</div>
-</div>
-</section>
-</body>
-</html>
+</pre>This file should match on both hosts and contains the hostname (uname -n) of the main server followed by the shared IP (VIP)/prefix/interface. Normally, you include the actual resource which should be monitored at the end of the line. Since you're just moving an IP back and forth for this setup, you can leave the last field blank.<p><strong>NOTE: Don&rsquo;t forget to make your services listen on 0.0.0.0 !</strong></p><br><p class=back-to-posts><a href=/blog>Back to posts</a></p></div><br><div class=disqus></div></div></div></section></body></html>
